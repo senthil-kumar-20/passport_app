@@ -83,61 +83,10 @@ CREATE TABLE Visa_Application_Cancellation (
   FOREIGN KEY (Occupation) REFERENCES Occupation_Details(Occupation),
   FOREIGN KEY (Destination_Country) REFERENCES Destination_Details(Country),
   CONSTRAINT FK_Passport FOREIGN KEY (Passport_Id) REFERENCES Passport_Apply_Reissue(Passport_Id),
-  CONSTRAINT CK_Date_Of_Application CHECK (Date_Of_Application >= CURDATE()),
-  CONSTRAINT CK_Date_Of_Expiry CHECK (Date_Of_Expiry >= Date_Of_Issue),
-  CONSTRAINT CK_Visa_Expiry CHECK (Date_Of_Expiry >= CURDATE()),
   CONSTRAINT CK_Visa_Id CHECK (Visa_Id <> ''),
   CONSTRAINT CK_Passport_Id CHECK (Passport_Id <> '')
 );
 
-DELIMITER //
-
-CREATE TRIGGER trg_Check_Expiry
-BEFORE INSERT ON Visa_Application_Cancellation
-FOR EACH ROW
-BEGIN
-  DECLARE passport_expiry DATE;
-  SET passport_expiry = (SELECT Date_Of_Expiry FROM Passport_Apply_Reissue WHERE Passport_Id = NEW.Passport_Id);
-  
-  IF NEW.Date_Of_Expiry < passport_expiry THEN
-    SET NEW.Date_Of_Expiry = passport_expiry;
-  END IF;
-END//
-
-CREATE TRIGGER trg_Check_Visa_Passport_Id
-BEFORE INSERT ON Visa_Application_Cancellation
-FOR EACH ROW
-BEGIN
-  DECLARE alphanumeric_pattern VARCHAR(100);
-  SET alphanumeric_pattern = '^[A-Za-z0-9]+$';
-
-  IF NEW.Visa_Id NOT REGEXP alphanumeric_pattern OR NEW.Passport_Id NOT REGEXP alphanumeric_pattern THEN
-    SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Invalid Visa_Id or Passport_Id';
-  END IF;
-END//
-
-CREATE TRIGGER trg_Check_Passport_User_Id
-BEFORE INSERT ON Visa_Application_Cancellation
-FOR EACH ROW
-BEGIN
-  DECLARE matching_passport_id VARCHAR(50);
-  SET matching_passport_id = (SELECT Passport_Id FROM User_Info WHERE User_Id = NEW.User_Id);
-  
-  IF NEW.Passport_Id <> matching_passport_id THEN
-    SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Passport_Id does not match with User_Id';
-  END IF;
-END//
-
-CREATE TRIGGER trg_Check_Visa_Expiry
-BEFORE INSERT ON Visa_Application_Cancellation
-FOR EACH ROW
-BEGIN
-  IF NEW.Date_Of_Expiry < CURDATE() THEN
-    SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Visa has already expired';
-  END IF;
-END//
-
-DELIMITER ;
 
 CREATE TABLE `Destination_Details` (
   `Destination_Country` VARCHAR(50) PRIMARY KEY,
