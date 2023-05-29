@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visa Application</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="script.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h2>Visa Application Form</h2>
+        <form id="visaForm" onsubmit="callvalue(event)">
+            <label for="userId">User ID:</label>
+            <input type="text" id="userId" placeholder="userId" required><br><br>
+
+            <label for="country">Destination Country:</label>
+            <select id="country" required>
+                <option value="" disabled selected>Select a country</option>
+                <option value="USA">USA</option>
+                <option value="CHINA">China</option>
+                <option value="JAPAN">Japan</option>
+            </select><br><br>
+
+            <label for="occupation">Occupation:</label>
+            <select id="occupation" required>
+                <option value="" disabled selected>Select an occupation</option>
+                <option value="Student">Student</option>
+                <option value="Private Employee">Private Employee</option>
+                <option value="Government Employee">Government Employee</option>
+                <option value="Self Employed">Self Employed</option>
+                <option value="Retire Employee">Retire Employee</option>
+            </select><br><br>
+
+            <label for="dateOfApplication">Date of Application:</label>
+            <input type="date" id="dateOfApplication" readonly><br><br>
+
+            <input type="submit" value="Apply">
+        </form>
+    </div>
+</body>
+</html>
